@@ -2,33 +2,23 @@ var express     = require("express"),
     app         = express(),
     bodyParser  = require("body-parser"),
     mongoose    = require("mongoose"),
-    campgroundDB = require("./models/campground");
+    campgroundDB = require("./models/campground"),
+    Comment     = require("./models/comment"),
+    seedDB      = require("./seeds");
 
+seedDB();
 mongoose.connect("mongodb://localhost/yelp_camp");
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 
-// campgroundDB.create({
-//     name: "Granite Hill",
-//     image: "https://recreation-acm.activefederal.com/assetfactory.aspx?did=7656",
-//     description: "Lorem ipsum dolor sit amet, sed mutat tritani cu, eam ea utamur definitionem. Ea incorrupte omittantur pri, cu vis admodum expetenda torquatos, quidam labitur."
-// }, 
-// function(err, campground){
-//     if (!err) {
-//         console.log(campground);
-//     } else {
-//         console.log(err);
-//     }
-// });
-
 app.get("/", function (req, res) {
-    res.render("landingPage");
+    res.render("campgrounds/landingPage");
 });
 
 app.get("/campgrounds", function(req, res){
     campgroundDB.find({}, function(err, allCampgrounds){
         if(!err) {
-             res.render("index", {campgrounds: allCampgrounds});
+             res.render("campgrounds/index", {campgrounds: allCampgrounds});
         }
         else {
             console.log(err);
@@ -51,15 +41,45 @@ app.post("/campgrounds", function (req, res) {
 });
 
 app.get("/campgrounds/new", function(req, res) {
-    res.render("new");
+    res.render("campgrounds/new");
 });
 
 app.get("/campgrounds/:id", function(req, res) {
-    campgroundDB.findById(req.params.id, function (err, queryResult) {
+    campgroundDB.findById(req.params.id).populate("comments").exec(function (err, queryResult) {
         if (!err) {
-            res.render("show", {campground: queryResult});
+            res.render("campgrounds/show", {campground : queryResult});
         } else {
             console.log(err);
+        }
+    });
+});
+
+app.get("/campgrounds/:id/comments/new", function(req, res) {
+    campgroundDB.findById(req.params.id, function (err, queryResult) {
+        if (err){
+            console.log(err);
+        }
+        else {
+            res.render("comments/new", {campground : queryResult});
+        }
+    })
+});
+
+app.post("/campgrounds/:id/comments", function(req, res){
+    campgroundDB.findById(req.params.id, function(err, campground) {
+        if (err){
+            console.log(err);
+            res.redirect("/campgrounds")
+        } else {
+            Comment.create(req.body.comment, function (err, comment) {
+                if (err){
+                    console.log(err);
+                } else {
+                    campground.comments.push(comment);
+                    campground.save();
+                    res.redirect("/campgrounds/" + campground._id);
+                }   
+            });
         }
     });
 });
