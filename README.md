@@ -30,8 +30,6 @@
 
 * Manage user account with basic functionalities:
 
-  * ~~Password reset via email confirmation~~ (disabled)
-
   * Profile page setup with sign-up
 
 * Flash messages responding to users' interaction with the app
@@ -49,8 +47,6 @@
 * Use Helmet to strengthen security
  
 ## Getting Started
-
-> This app contains API secrets and passwords that have been hidden deliberately, so the app cannot be run with its features on your local machine. However, feel free to clone this repository if necessary.
 
 ### Comments in code
 
