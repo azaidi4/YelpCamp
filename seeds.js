@@ -33,21 +33,21 @@ function seedDB(){
                 if (err) {
                     console.log(err);
                 } else {
-                   Comment.create({
-                       text: "Y youuu no wifi?!",
-                       author: "Anon-132"
-                   }, function(err, comment) {
+                  Comment.create({
+                      text: "Y youuu no wifi?!",
+                      author: "Anon-132"
+                  }, function(err, comment) {
                       if (err){
                           console.log(err)
                       } else {
-                           campgrounds.comments.push(comment);
-                           campgrounds.save();
-                           console.log("created new comment")
+                          campgrounds.comments.push(comment);
+                          campgrounds.save();
+                          console.log("created new comment")
                       }
-                   })
+                  })
                 }
             });
         });
-    })
+    });
 }
 module.exports = seedDB;
